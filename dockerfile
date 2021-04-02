@@ -1,0 +1,45 @@
+FROM python:3.8
+
+ARG TAG=local
+
+WORKDIR /usr/src/
+
+
+# VARIABLES PREDEFINIDAS
+ENV PORTAL2_BOT_VERSION=${TAG}
+
+ENV PORTAL2_BOT_PYTHON_HOST=0.0.0.0
+ENV PORTAL2_BOT_PYTHON_PORT=5000
+ENV PORTAL2_BOT_PYTHON_GUNICORN_WORKERS=1
+ENV PORTAL2_BOT_PYTHON_GUNICORN_CONNECTIONS=1000
+ENV PORTAL2_BOT_PYTHON_NOMBRE_APP=app
+ENV PORTAL2_BOT_PYTHON_NOMBRE_FUNCION_APP=app
+
+
+# EJECUCION
+CMD gunicorn \
+    -b ${PORTAL2_BOT_PYTHON_HOST}:${PORTAL2_BOT_PYTHON_PORT} \
+    --reload \
+    --workers=${PORTAL2_BOT_PYTHON_GUNICORN_WORKERS} \
+    --worker-connections=${PORTAL2_BOT_PYTHON_GUNICORN_CONNECTIONS} \
+    ${PORTAL2_BOT_PYTHON_NOMBRE_APP}:${PORTAL2_BOT_PYTHON_NOMBRE_FUNCION_APP}
+
+EXPOSE ${PORTAL2_BOT_PYTHON_PORT}
+
+
+# DEPENDENCIAS
+RUN pip install compile --upgrade pip
+
+COPY ./requirements.txt .
+COPY ./files ./files
+
+RUN pip install -r requirements.txt
+RUN rm requirements.txt
+
+
+# COMPILACION
+COPY ./apps ./src/apps
+COPY ./app.py ./src
+
+RUN python -m compile -b -f -o ./dist ./src
+RUN mv -f ./dist/src/* .
