@@ -1,0 +1,5 @@
+.env
+.vscode/
+token.json
+__pycache__/
+venv/
