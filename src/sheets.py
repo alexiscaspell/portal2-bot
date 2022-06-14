@@ -20,7 +20,7 @@ class GoogleSheet():
         return self.sheet.col_values(LETTERS.index(column)+1)
 
     def value(self,cell:str):
-        return self.sheet.cell(int(cell[1:]),LETTERS.index(cell[0])+1)
+        return self.sheet.cell(int(cell[1:]),LETTERS.index(cell[0])+1).value
 
     def update_row(self,start_cell:str,value_list:list):
         start_column = start_cell[0]
@@ -51,5 +51,3 @@ def load_data(spreadsheet_id:str):
     sheet=sheet.sheet1
 
     return GoogleSheet(sheet)
-
-"A"

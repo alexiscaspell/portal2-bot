@@ -22,11 +22,13 @@ class Portal2Info():
     def latest_played_map_number_row(self):
         return len(self.sheet.column("C"))
 
-    def update_map_start_time(self,row:int,time_value:str):
-        self.sheet.update_value(f"D{row}",time_value)
+    def end_map_by_row(self,row:int):
+        self.sheet.update_value(f"E{row}",self.actual_hour)
+        self.sheet.update_value(f"C{row}","Si")
 
-    def update_map_end_time(self,row:int):
-        self.sheet.update_value(f"E{row}",self.load_value("I3"))
+    def start_map_by_row(self,row:int):
+        self.sheet.update_value(f"D{row}",self.actual_hour)
+
 
     def add_map(self,title_map:str):
         last_row = self.latest_played_map_number_row()

@@ -23,25 +23,27 @@ async def start_map(ctx,mapa:str=None):
 
     if mapa is None:
         row = portal_data.latest_played_map_number_row()
+        row+=1
     elif mapa.isnumeric():
         row = portal_data.map_number_row_by_id(mapa)
     else:
         row = portal_data.map_number_row_by_name(mapa)
-    
-    portal_data.update_map_start_time(row,portal_data.actual_hour)
 
+    portal_data.start_map_by_row(row)
+    
     response = "Sssssssse derrechuuu!"
-    await ctx.respond(response)
+    await ctx.channel.send(response)
 
 @bot.slash_command(description="Termina el mapa empezado previamente")
 async def end_map(ctx):
     load_context()
 
-    row = portal_data.latest_played_map_number_row()
-    portal_data.update_map_end_time(row,portal_data.actual_hour)
+    row = portal_data.latest_played_map_number_row()+1
+
+    portal_data.end_map_by_row(row)
 
     response = "Disculpame si te gane muy rapido pero asi es el portal champagne"
-    await ctx.respond(response)
+    await ctx.channel.send(response)
 
 @bot.slash_command(description="Obtiene los stats de tiempo de juego")
 async def stats(ctx):
@@ -52,30 +54,27 @@ async def stats(ctx):
 
     response+="#########################"
 
-    await ctx.respond(response)
+    await ctx.channel.send(response)
 
 @bot.slash_command()
 async def pause_map(ctx):
     load_context()
     response = "Jiji todavia no se hacer eso"
-    await ctx.respond(response)
+    await ctx.channel.send(response)
 
 @bot.slash_command(description="/add_map <url mapa>")
 async def add_map(ctx,url:str):
     load_context()
 
-    if not url:
-        await ctx.respond("Sossss un hijjjo deee, pasame un link!!")
-    else:
-        title = req.get(url).text.split("</title>")[0].split("<title>")[1]
+    title = req.get(url).text.split("</title>")[0].split("<title>")[1]
 
-        if title.startswith("Steam Workshop::"):
-            title = title[len("Steam Workshop::"):]
+    if title.startswith("Steam Workshop::"):
+        title = title[len("Steam Workshop::"):]
 
-        portal_data.add_map(title)
+    portal_data.add_map(title)
 
-        response = "Mapa guardado"
-        await ctx.respond(response)
+    response = "Mapa guardado"
+    await ctx.channel.send(response)
 
 @bot.event
 async def on_ready():
