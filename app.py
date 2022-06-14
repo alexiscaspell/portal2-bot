@@ -53,7 +53,7 @@ async def end_map(ctx):
     portal_data.end_map_by_row(row)
 
     response = "Disculpame si te gane muy rapido pero asi es el portal champagne"
-    await send_respnse(ctx,response)
+    await send_response(ctx,response)
 
 @bot.slash_command(description="Obtiene los stats de tiempo de juego")
 async def stats(ctx):
@@ -78,12 +78,10 @@ async def pause_map(ctx):
     await send_response(ctx,response)
 
 
-@bot.slash_command(description="Envia meme random de portal")
-async def meme(ctx:ApplicationContext):
+@bot.slash_command(description="Envia meme random de <key> (default 'portal2 meme')")
+async def meme(ctx:ApplicationContext,key="portal2 hilarious meme"):
 
     await ctx.respond("Ahi te lo busco papa")
-
-    key="portal2 meme"
 
     async with ctx.typing():
         links = PinterestImageScraper().scrape_links(key)
