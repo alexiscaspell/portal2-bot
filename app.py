@@ -4,6 +4,8 @@ import discord
 from src.portal2 import Portal2Info
 from src.sheets import load_data
 import requests as req
+from src.pinterest import PinterestImageScraper
+from random import randint
 
 load_dotenv()
 
@@ -63,8 +65,8 @@ async def stats(ctx):
 
     await send_response(ctx,response)
 
-@bot.slash_command()
-async def pause_map(ctx,):
+@bot.slash_command(description="Pausa el mapa empezado previamente")
+async def pause_map(ctx):
     load_context()
 
     row = portal_data.latest_played_map_number_row()+1
@@ -72,6 +74,19 @@ async def pause_map(ctx,):
     # portal_data.pause_map_by_row(row)
 
     response = "Jiji todavia no se hacer eso"
+    await send_response(ctx,response)
+
+@bot.slash_command(description="Envia meme random de portal")
+async def meme(ctx):
+    load_context()
+
+    key="portal2 meme"
+
+    links = PinterestImageScraper().scrape_links(key)
+
+    selected_index = randint(0,len(links)-1)
+
+    response = links[selected_index]
     await send_response(ctx,response)
 
 @bot.slash_command(description="/add_map <url mapa>")
