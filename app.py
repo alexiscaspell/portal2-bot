@@ -6,6 +6,7 @@ from src.sheets import load_data
 import requests as req
 from src.pinterest import PinterestImageScraper
 from random import randint
+from discord import ApplicationContext
 
 load_dotenv()
 
@@ -19,7 +20,7 @@ def load_context():
     global portal_data
     portal_data = Portal2Info(load_data(SAMPLE_SPREADSHEET_ID))
 
-async def send_response(ctx,message):
+async def send_response(ctx:ApplicationContext,message):
     try:
         await ctx.respond(message)
     except Exception as _:
@@ -52,7 +53,7 @@ async def end_map(ctx):
     portal_data.end_map_by_row(row)
 
     response = "Disculpame si te gane muy rapido pero asi es el portal champagne"
-    await send_response(ctx,response)
+    await send_respnse(ctx,response)
 
 @bot.slash_command(description="Obtiene los stats de tiempo de juego")
 async def stats(ctx):
@@ -76,18 +77,22 @@ async def pause_map(ctx):
     response = "Jiji todavia no se hacer eso"
     await send_response(ctx,response)
 
+
 @bot.slash_command(description="Envia meme random de portal")
-async def meme(ctx):
-    load_context()
+async def meme(ctx:ApplicationContext):
+
+    await ctx.respond("Ahi te lo busco papa")
 
     key="portal2 meme"
 
-    links = PinterestImageScraper().scrape_links(key)
+    async with ctx.typing():
+        links = PinterestImageScraper().scrape_links(key)
 
-    selected_index = randint(0,len(links)-1)
+        selected_index = randint(0,len(links)-1)
 
-    response = links[selected_index]
-    await send_response(ctx,response)
+        response = links[selected_index]
+
+    await ctx.interaction.edit_original_message(content=response)
 
 @bot.slash_command(description="/add_map <url mapa>")
 async def add_map(ctx,url:str):
