@@ -1,27 +1,59 @@
-import pandas as pd
+from src.sheets import GoogleSheet
 
 class Portal2Info():
-    def __init__(self,values:pd.DataFrame):
-        self.stats = self.load_stats(values)
-        self.hora_actual = self.load_value("I3",values)
-        self.values = values
+    def __init__(self,sheet:GoogleSheet):
+        self.sheet = sheet
+        self.stats = self.load_stats()
+        self.actual_hour = self.load_value("I3")
 
-    def load_value(self,key,data:pd.DataFrame):
-        print(f"obteniendo valor {key}")
+    def load_value(self,key):
         if key.isnumeric():
-            print(f"{key} es un numero!!!")
-            return data.iloc[[int(key)]]
+            return self.sheet.row(int(key))
+        return self.sheet.value(key)
 
-        print(f"{key} no es numero...")
-        print(f"clumna {key[0]}")
-        print(f"fila {int(key[1:])}")
-        return data[key[0]][int(key[1:])]
+    def map_number_row_by_id(self,id:str):
+        ids_column = self.sheet.column("A")
+        return ids_column.index(id)+1
 
-    def load_stats(self,values):
+    def map_number_row_by_name(self,name:str):
+        ids_column = self.sheet.column("B")
+        return ids_column.index(id)+1
+
+    def latest_played_map_number_row(self):
+        return len(self.sheet.column("C"))
+
+    def update_map_start_time(self,row:int,time_value:str):
+        self.sheet.update_value(f"D{row}",time_value)
+
+    def update_map_end_time(self,row:int):
+        self.sheet.update_value(f"E{row}",self.load_value("I3"))
+
+    def add_map(self,title_map:str):
+        last_row = self.latest_played_map_number_row()
+        new_row = last_row+1
+
+        start_cell = f"B{new_row}"
+
+        elapsed_time_cell = f'=IF(D{new_row}="";"";IF(E{new_row}="";NOW();E{new_row})-D{new_row})'
+        elapsed_net_time_cell = f"=F{new_row}"
+
+        values = [title_map,"","",""]
+
+        if self.load_value(f"A{new_row}")=="":
+            start_cell = f"A{new_row}"
+            values = [f"=A{last_row}+1"] + values
+
+        self.sheet.update_row(start_cell,values)
+
+        self.sheet.update_value(f"F{new_row}",elapsed_time_cell,is_formula=True)
+        self.sheet.update_value(f"G{new_row}",elapsed_net_time_cell,is_formula=True)
+
+    def load_stats(self):
         result = {}
-        print("Llegue derechupete")
+        columna_keys = self.sheet.column("H")
+        columna_values = self.sheet.column("I")
         for n in range(6,14):
-            key = self.load_value(f"H{n}",values)
-            value = self.load_value(f"I{n}",values)
+            key = columna_keys[n-1]
+            value = columna_values[n-1]
             result.update({key:value})
         return result

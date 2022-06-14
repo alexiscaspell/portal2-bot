@@ -3,7 +3,7 @@
 git+https://github.com/Pycord-Development/pycord
 python-dotenv
 requests
-pandas
+gspread
 google-api-python-client 
-google-auth-httplib2 
+google-auth-httplib2
 google-auth-oauthlib
