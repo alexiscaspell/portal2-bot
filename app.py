@@ -17,6 +17,13 @@ def load_context():
     global portal_data
     portal_data = Portal2Info(load_data(SAMPLE_SPREADSHEET_ID))
 
+async def send_response(ctx,message):
+    try:
+        await ctx.respond(message)
+    except Exception as _:
+        await ctx.channel.send(message)
+
+
 @bot.slash_command(description="/start_map <nombre mapa | nro mapa (default comienza el siguiente en la lista)>")
 async def start_map(ctx,mapa:str=None):
     load_context()
@@ -32,7 +39,7 @@ async def start_map(ctx,mapa:str=None):
     portal_data.start_map_by_row(row)
     
     response = "Sssssssse derrechuuu!"
-    await ctx.channel.send(response)
+    await send_response(ctx,response)
 
 @bot.slash_command(description="Termina el mapa empezado previamente")
 async def end_map(ctx):
@@ -43,7 +50,7 @@ async def end_map(ctx):
     portal_data.end_map_by_row(row)
 
     response = "Disculpame si te gane muy rapido pero asi es el portal champagne"
-    await ctx.channel.send(response)
+    await send_response(ctx,response)
 
 @bot.slash_command(description="Obtiene los stats de tiempo de juego")
 async def stats(ctx):
@@ -54,13 +61,18 @@ async def stats(ctx):
 
     response+="#########################"
 
-    await ctx.channel.send(response)
+    await send_response(ctx,response)
 
 @bot.slash_command()
-async def pause_map(ctx):
+async def pause_map(ctx,):
     load_context()
+
+    row = portal_data.latest_played_map_number_row()+1
+
+    # portal_data.pause_map_by_row(row)
+
     response = "Jiji todavia no se hacer eso"
-    await ctx.channel.send(response)
+    await send_response(ctx,response)
 
 @bot.slash_command(description="/add_map <url mapa>")
 async def add_map(ctx,url:str):
@@ -73,8 +85,8 @@ async def add_map(ctx,url:str):
 
     portal_data.add_map(title)
 
-    response = "Mapa guardado"
-    await ctx.channel.send(response)
+    response = f"Mapa {title} guardado"
+    await send_response(ctx,response)
 
 @bot.event
 async def on_ready():
