@@ -7,6 +7,7 @@ import requests as req
 from src.pinterest import PinterestImageScraper
 from random import randint
 from discord import ApplicationContext
+import time
 
 load_dotenv()
 
@@ -40,7 +41,9 @@ async def start_map(ctx,mapa:str=None):
         row = portal_data.map_number_row_by_name(mapa)
 
     portal_data.start_map_by_row(row)
-    
+    time.sleep(1)
+    load_context()
+    portal_data.start_map_by_row(row)
     response = "Sssssssse derrechuuu!"
     await send_response(ctx,response)
 
@@ -51,6 +54,10 @@ async def end_map(ctx):
     row = portal_data.latest_played_map_number_row()+1
 
     portal_data.end_map_by_row(row)
+    time.sleep(1)
+    load_context()
+    portal_data.end_map_by_row(row)
+
 
     response = "Disculpame si te gane muy rapido pero asi es el portal champagne"
     await send_response(ctx,response)
@@ -104,6 +111,15 @@ async def add_map(ctx,url:str):
     portal_data.add_map(title)
 
     response = f"Mapa {title} guardado"
+    await send_response(ctx,response)
+
+@bot.slash_command(description="Devuelve le siguiente mapa a jugar")
+async def next_map(ctx,):
+    load_context()
+
+    response = portal_data.next_map()
+    response = "No hay mapa vieja" if response=="" else response
+
     await send_response(ctx,response)
 
 @bot.event

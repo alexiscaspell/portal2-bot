@@ -29,9 +29,12 @@ class Portal2Info():
     def start_map_by_row(self,row:int):
         self.sheet.update_value(f"D{row}",self.actual_hour)
 
+    def next_map(self):
+        return self.sheet.value(f"B{self.latest_played_map_number_row()+1}")
+
 
     def add_map(self,title_map:str):
-        last_row = self.latest_played_map_number_row()
+        last_row = len(self.sheet.column("B"))
         new_row = last_row+1
 
         start_cell = f"B{new_row}"
