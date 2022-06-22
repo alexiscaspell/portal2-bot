@@ -1,4 +1,6 @@
-def make_str_table(data,title=None):
+from table2ascii import table2ascii as t2a, PresetStyle
+
+def make_str_table_old(data,title=None):
 
     if isinstance(data,dict):
         data_tuple = [(k, v) if isinstance(v,str) else (k,)+tuple(v) for k, v in data.items()]
@@ -26,3 +28,17 @@ def make_str_table(data,title=None):
         str_table+= " "+"-"* (2*len(max_widths)+sum(max_widths)+1)+" \n"
 
     return str_table
+
+def make_str_table(data,title=None):
+    if isinstance(data,dict):
+        data_tuple = [(k, v) if isinstance(v,str) else (k,)+tuple(v) for k, v in data.items()]
+    else:
+        data_tuple = [e if isinstance(e,list) or isinstance(e,tuple) else [e] for e in data]
+
+    headers = data_tuple.pop(0)
+
+    # In your command:
+    return t2a(header=headers,
+        body=data_tuple,
+        style=PresetStyle.thick_box
+    )
