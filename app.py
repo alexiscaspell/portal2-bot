@@ -16,7 +16,8 @@ load_dotenv()
 
 TOKEN = os.getenv('DISCORD_TOKEN')
 SAMPLE_SPREADSHEET_ID = os.getenv('SPREADSHEET_ID')
-ADMIN_USERS = os.getenv('ADMIN_USERS',"").split(",")
+ADMIN_USERS = os.getenv('ADMIN_USERS',None)
+ADMIN_USERS= ADMIN_USERS.split(",") if ADMIN_USERS else []
 
 bot = discord.Bot()
 portal_data = None
@@ -37,7 +38,7 @@ async def validate_permissions(ctx:ApplicationContext):
     print(f"{message_user} me acaba de invocar")
 
     if len(ADMIN_USERS)>0 and message_user not in ADMIN_USERS:
-        await ctx.respond(f"{message_user} papu, no tenes permisos")
+        await ctx.respond(f"**{message_user}** papu, no tenes permisos")
         raise RuntimeError(f"El usuario {message_user} no tiene permisos de admin")
 
 

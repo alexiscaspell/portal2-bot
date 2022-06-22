@@ -26,7 +26,7 @@ class GoogleSheet():
     def update_row(self,start_cell:str,value_list:list):
         start_column,start_row = GoogleSheet.cell_to_index(start_cell)
 
-        end_cell = LETTERS[LETTERS.index(start_column)+len(value_list)-1]+f"{start_row}"
+        end_cell = LETTERS[start_column+len(value_list)-1]+f"{start_row}"
 
         cell_list = self.sheet.range(f"{start_cell}:{end_cell}")
 
