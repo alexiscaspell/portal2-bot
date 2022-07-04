@@ -31,14 +31,14 @@ def make_str_table_old(data,title=None):
 
 def make_str_table(data,title=None):
     if isinstance(data,dict):
-        data_tuple = [(k, v) if isinstance(v,str) else (k,)+tuple(v) for k, v in data.items()]
+        data_list = [[k, v] if isinstance(v,str) else [k]+list(v) for k, v in data.items()]
     else:
-        data_tuple = [e if isinstance(e,list) or isinstance(e,tuple) else [e] for e in data]
+        data_list = [list(e) if isinstance(e,list) or isinstance(e,tuple) else [e] for e in data]
 
-    headers = data_tuple.pop(0)
+    headers = data_list.pop(0)
 
     # In your command:
     return t2a(header=headers,
-        body=data_tuple,
+        body=data_list,
         style=PresetStyle.thick_box
     )

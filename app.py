@@ -1,7 +1,9 @@
 import os
 from dotenv import load_dotenv
 import discord
-from src.portal2 import Portal2Info,Portal2Query
+from src.portal2_info import Portal2Info
+from src.portal2_query import Portal2Query
+from src.portal2_map import MapList
 from src.sheets import load_data
 import requests as req
 from src.pinterest import PinterestImageScraper
@@ -20,10 +22,11 @@ ADMIN_USERS = os.getenv('ADMIN_USERS',None)
 ADMIN_USERS= ADMIN_USERS.split(",") if ADMIN_USERS else []
 
 bot = discord.Bot()
-portal_data = None
+portal_data:Portal2Info = None
 
 def load_context():
     global portal_data
+    portal_data = None
     portal_data = Portal2Info(load_data(SAMPLE_SPREADSHEET_ID))
 
 async def send_response(ctx:ApplicationContext,message):
@@ -48,18 +51,24 @@ async def start_map(ctx,mapa:str=None):
 
     load_context()
 
-    if mapa is None:
-        row = portal_data.latest_played_map_number_row()
-        row+=1
-    elif mapa.isnumeric():
-        row = portal_data.map_number_row_by_id(mapa)
-    else:
-        row = portal_data.map_number_row_by_name(mapa)
+    maps:MapList = portal_data.maps
 
-    portal_data.start_map_by_row(row)
+    if mapa is None:
+        map = maps.next()
+
+    elif str(mapa).isnumeric():
+        map = maps.map(id=str(mapa))
+    else:
+        map = maps.map(name=mapa)
+
+    map.start()
+
     time.sleep(1)
     load_context()
-    portal_data.start_map_by_row(row)
+
+    map = portal_data.maps.map(row=map.row)
+    map.start()
+
     response = "Sssssssse derrechuuu!"
     await send_response(ctx,response)
 
@@ -69,13 +78,16 @@ async def end_map(ctx):
 
     load_context()
 
-    row = portal_data.latest_played_map_number_row()+1
+    maps:MapList = portal_data.maps
+    map = maps.next()
 
-    portal_data.end_map_by_row(row)
+    map.end()
+
     time.sleep(1)
     load_context()
-    portal_data.end_map_by_row(row)
 
+    map = portal_data.maps.map(row=map.row)
+    map.end()
 
     response = "Disculpame si te gane muy rapido pero asi es el portal champagne"
     await send_response(ctx,response)
@@ -94,11 +106,41 @@ async def pause_map(ctx):
 
     load_context()
 
-    row = portal_data.latest_played_map_number_row()+1
+    maps:MapList = portal_data.maps
+    map = maps.earliest_paused()
 
-    # portal_data.pause_map_by_row(row)
+    if map is None:
+        map = maps.next()
 
-    response = "Jiji todavia no se hacer eso"
+    time.sleep(1)
+    load_context()
+
+    map = portal_data.maps.map(row=map.row)
+    map.pause()
+
+    response=f"Mapa {map.name.get()} ({map.id.get()}) pausado"
+
+    await send_response(ctx,response)
+
+@bot.slash_command(description="Despausa el mapa pausado previamente")
+async def unpause_map(ctx):
+    await validate_permissions(ctx)
+
+    load_context()
+
+    maps:MapList = portal_data.maps
+    map = maps.earliest_paused()
+
+    map.unpause()
+
+    time.sleep(1)
+    load_context()
+
+    map = portal_data.maps.map(row=map.row)
+    map.unpause()
+
+    response=f"Mapa {map.name.get()} ({map.id.get()}) despausado"
+
     await send_response(ctx,response)
 
 
@@ -128,7 +170,7 @@ async def add_map(ctx,url:str):
     if title.startswith("Steam Workshop::"):
         title = title[len("Steam Workshop::"):]
 
-    portal_data.add_map(title)
+    portal_data.maps.add(title)
 
     response = f"Mapa {title} guardado"
     await send_response(ctx,response)
@@ -137,8 +179,8 @@ async def add_map(ctx,url:str):
 async def next_map(ctx):
     load_context()
 
-    response = portal_data.next_map()
-    response = "No hay mapa vieja" if response=="" else response
+    map = portal_data.maps.next()
+    response = "No hay mapa vieja" if map is None else f"{map.name.get()} ({map.id.get()})"
 
     await send_response(ctx,response)
 
@@ -148,7 +190,7 @@ async def query_maps(ctx,played:bool=None,name=None,id:int=None,start_date=None,
 
     await ctx.respond("Buscando ...")
 
-    query = Portal2Query(portal_data)
+    query = portal_data.maps.query()
 
     query = query.filter_by_played(played).filter_by_name(name).filter_by_id(id)
     query = query.filter_by_start_date(start_date).filter_by_end_date(end_date)
