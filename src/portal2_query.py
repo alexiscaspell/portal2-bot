@@ -6,7 +6,7 @@ class Portal2Query():
 
         self.querys=[]
 
-        width,_ = GoogleSheet.cell_to_index("G1")
+        width,_ = GoogleSheet.cell_to_index("H1")
 
         for i in range(1,sheet.count_rows()+1):
             self.data.append(sheet.eager_row(i)[0:width])
@@ -42,7 +42,7 @@ class Portal2Query():
         if played is None:
             return self
 
-        valid_values=["No",""]
+        valid_values=["No","","Pausado"]
 
         if played:
             valid_values=["Si","Ya jogado antes de los primeros 50"]
