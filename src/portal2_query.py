@@ -1,4 +1,5 @@
 from src.sheets import GoogleSheet
+from src.sheet_mappings import SheetCell, SheetCol
 
 class Portal2Query():
     def __init__(self,sheet:GoogleSheet):
@@ -6,7 +7,7 @@ class Portal2Query():
 
         self.querys=[]
 
-        width,_ = GoogleSheet.cell_to_index("H1")
+        width,_ = GoogleSheet.cell_to_index(f"{SheetCol.outer_map_table.value}1")
 
         for i in range(1,sheet.count_rows()+1):
             self.data.append(sheet.eager_row(i)[0:width])
@@ -18,7 +19,7 @@ class Portal2Query():
         if date is None:
             return self
 
-        self.add_is_in_filter("D",date)
+        self.add_is_in_filter(SheetCol.start.value,date)
 
         return self
 
@@ -26,7 +27,7 @@ class Portal2Query():
         if date is None:
             return self
 
-        self.add_is_in_filter("E",date)
+        self.add_is_in_filter(SheetCol.end.value,date)
 
         return self
 
@@ -34,7 +35,7 @@ class Portal2Query():
         if name is None:
             return self
 
-        self.add_is_in_filter("B",name)
+        self.add_is_in_filter(SheetCol.name.value,name)
 
         return self
 
@@ -50,8 +51,8 @@ class Portal2Query():
         def fun(data,x):
             return data[x] in valid_values
 
-        self.add_filter("C",fun)
-        self.add_not_empty_filter("B")
+        self.add_filter(SheetCol.played.value,fun)
+        self.add_not_empty_filter(SheetCol.name.value)
 
         return self
 
@@ -63,7 +64,7 @@ class Portal2Query():
         if id is None:
             return self
 
-        self.add_equal_filter("A",str(id))
+        self.add_equal_filter(SheetCol.id.value,str(id))
         return self
 
     def add_is_in_filter(self,column,value):

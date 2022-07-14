@@ -79,7 +79,7 @@ async def end_map(ctx):
     load_context()
 
     maps:MapList = portal_data.maps
-    map = maps.next()
+    map = maps.current()
 
     map.end()
 
@@ -107,10 +107,10 @@ async def pause_map(ctx):
     load_context()
 
     maps:MapList = portal_data.maps
-    map = maps.earliest_paused()
 
-    if map is None:
-        map = maps.next()
+    map = maps.current()
+
+    map.pause()
 
     time.sleep(1)
     load_context()
