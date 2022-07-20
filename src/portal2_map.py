@@ -40,6 +40,7 @@ class Map():
         self.end_time = MapProperty("end_time",SheetCol.end.value,self.row,self.sheet,map_dict.get("end_time",None))
         self.elapsed_time = MapProperty("elapsed_time",SheetCol.eltime.value,self.row,self.sheet,map_dict.get("elapsed_time",None))
         self.elapsed_net_time = MapProperty("elapsed_net_time",SheetCol.elnettime.value,self.row,self.sheet,map_dict.get("elapsed_net_time",None))
+        self.link = MapProperty("link",SheetCol.link.value,self.row,self.sheet,map_dict.get("link",None))
 
     def end(self):
         self.end_time.set(self.actual_hour)
@@ -82,7 +83,7 @@ class MapList():
         self.sheet = sheet
         self.actual_hour = actual_hour
 
-    def add(self,title_map:str):
+    def add(self,title_map:str,link:str=None):
         last_row = len(self.sheet.column(SheetCol.name.value))
         new_row = last_row+1
 
@@ -91,7 +92,7 @@ class MapList():
         elapsed_time_cell = f'=IF({SheetCol.start.value}{new_row}="";"";IF({SheetCol.end.value}{new_row}="";NOW();{SheetCol.end.value}{new_row})-{SheetCol.start.value}{new_row})'
         elapsed_net_time_cell = f"={SheetCol.eltime.value}{new_row}"
 
-        values = [title_map,"","",""]
+        values = [title_map,"","","","","",link if link else ""]
 
         if load_value(self.sheet,f"{SheetCol.id.value}{new_row}")=="":
             start_cell = f"{SheetCol.id.value}{new_row}"
@@ -111,7 +112,7 @@ class MapList():
         data = {"row":row}
 
         if not lazy:
-            columns=["id","name","status","start_time","end_time","elapsed_time","elapsed_net_time"]
+            columns=["id","name","status","start_time","end_time","elapsed_time","elapsed_net_time","link"]
             values = load_value(self.sheet,str(row))
 
             for i,v in enumerate(values):

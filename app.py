@@ -170,7 +170,7 @@ async def add_map(ctx,url:str):
     if title.startswith("Steam Workshop::"):
         title = title[len("Steam Workshop::"):]
 
-    portal_data.maps.add(title)
+    portal_data.maps.add(title,url)
 
     response = f"Mapa {title} guardado"
     await send_response(ctx,response)
