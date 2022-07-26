@@ -92,7 +92,9 @@ class MapList():
         elapsed_time_cell = f'=IF({SheetCol.start.value}{new_row}="";"";IF({SheetCol.end.value}{new_row}="";NOW();{SheetCol.end.value}{new_row})-{SheetCol.start.value}{new_row})'
         elapsed_net_time_cell = f"={SheetCol.eltime.value}{new_row}"
 
-        values = [title_map,"","","","","",link if link else ""]
+        link_cell=f'=HYPERLINK("{link}";"{title_map}")'
+
+        values = [title_map,"","","","",""]
 
         if load_value(self.sheet,f"{SheetCol.id.value}{new_row}")=="":
             start_cell = f"{SheetCol.id.value}{new_row}"
@@ -102,6 +104,7 @@ class MapList():
 
         self.sheet.update_value(f"{SheetCol.eltime.value}{new_row}",elapsed_time_cell,is_formula=True)
         self.sheet.update_value(f"{SheetCol.elnettime.value}{new_row}",elapsed_net_time_cell,is_formula=True)
+        self.sheet.update_value(f"{SheetCol.link.value}{new_row}",link_cell,is_formula=True)
 
     def map(self,id=None,row=None,name=None,lazy=False):
         if id:
